@@ -1,18 +1,13 @@
 // =================================================================
-// 1. CONFIGURACIÓN SUPABASE
-//    Reemplaza estos valores con los de tu proyecto en Supabase.
-//    La anon key es pública y segura siempre que uses RLS.
 // =================================================================
 const SUPABASE_URL = 'https://tu-proyecto.supabase.co'; // 
 const SUPABASE_ANON_KEY = 'tu-anon-key-aqui'; // 
 
 // =================================================================
-// 2. INICIALIZAR SUPABASE
 // =================================================================
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // =================================================================
-// 3. REFERENCIAS DOM
 // =================================================================
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
@@ -61,7 +56,6 @@ const modalSaveText = $('#modalSaveText');
 const modalSaveSpinner = $('#modalSaveSpinner');
 
 // =================================================================
-// 4. TOAST SYSTEM (notificaciones seguras)
 // =================================================================
 function showToast(message, type = 'info') {
     const container = $('#toastContainer');
@@ -83,7 +77,6 @@ function showToast(message, type = 'info') {
 }
 
 // =================================================================
-// 5. AUTENTICACIÓN
 // =================================================================
 async function handleLogin(e) {
     e.preventDefault();
@@ -134,7 +127,6 @@ async function handleLogout() {
 }
 
 // =================================================================
-// 6. CRUD: OBTENER ALUMNOS
 // =================================================================
 let allStudents = [];
 
@@ -154,7 +146,6 @@ async function fetchStudents() {
 }
 
 // =================================================================
-// 7. RENDER: TABLA + ESTADÍSTICAS
 // =================================================================
 function renderStudents(list) {
     const data = list || allStudents;
@@ -237,7 +228,6 @@ function updateStats(data) {
 }
 
 // =================================================================
-// 8. CRUD: AGREGAR / ACTUALIZAR / ELIMINAR
 // =================================================================
 async function saveStudent(data) {
     const id = data.id || null;
@@ -297,7 +287,6 @@ async function handleDelete(id) {
 }
 
 // =================================================================
-// 9. REFRESCAR DATOS Y RENDER
 // =================================================================
 async function refreshData() {
     await fetchStudents();
@@ -316,7 +305,6 @@ function filterStudents(list) {
 }
 
 // =================================================================
-// 10. MODAL: ABRIR / CERRAR
 // =================================================================
 function openModal(title, data = null) {
     modalTitle.textContent = title;
@@ -362,7 +350,6 @@ function openEditModal(id) {
 }
 
 // =================================================================
-// 11. CALCULAR EDAD AUTOMÁTICA
 // =================================================================
 function calcularEdad() {
     const fecha = sFechaNac.value;
@@ -379,7 +366,6 @@ function calcularEdad() {
 }
 
 // =================================================================
-// 12. FORMATEAR FECHA
 // =================================================================
 function formatDate(dateStr) {
     if (!dateStr) return '—';
@@ -390,7 +376,6 @@ function formatDate(dateStr) {
 }
 
 // =================================================================
-// 13. ESCAPE HTML (seguridad)
 // =================================================================
 function escHtml(str) {
     if (!str) return '';
@@ -399,7 +384,6 @@ function escHtml(str) {
 }
 
 // =================================================================
-// 14. EVENTOS: LOGIN, LOGOUT, BUSCAR, MODAL, FORM
 // =================================================================
 loginForm.addEventListener('submit', handleLogin);
 logoutBtn.addEventListener('click', handleLogout);
@@ -467,7 +451,6 @@ studentForm.addEventListener('submit', async (e) => {
 });
 
 // =================================================================
-// 15. VERIFICAR SESIÓN AL CARGAR
 // =================================================================
 async function checkSession() {
     try {
@@ -503,7 +486,6 @@ async function loadApp() {
 }
 
 // =================================================================
-// 16. INICIO
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     // Mostrar login por defecto, app oculta
