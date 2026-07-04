@@ -3,8 +3,8 @@
 //    Reemplaza estos valores con los de tu proyecto en Supabase.
 //    La anon key es pública y segura siempre que uses RLS.
 // =================================================================
-const SUPABASE_URL = 'https://tu-proyecto.supabase.co'; // <--- CAMBIAR
-const SUPABASE_ANON_KEY = 'tu-anon-key-aqui'; // <--- CAMBIAR
+const SUPABASE_URL = 'https://tu-proyecto.supabase.co'; // 
+const SUPABASE_ANON_KEY = 'tu-anon-key-aqui'; // 
 
 // =================================================================
 // 2. INICIALIZAR SUPABASE
