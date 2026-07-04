@@ -1,8 +1,7 @@
 // =================================================================
 // =================================================================
-const SUPABASE_URL = 'https://mveqwpsmgtvlmzdcbxkj.supabase.co'; // 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12ZXF3cHNtZ3R2bG16ZGNieGtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODA4NzAsImV4cCI6MjA5ODY1Njg3MH0.JKecCwzBgS7cePVJVEhWnmLIGgcwunz-lU16EeRmeUY'; // 
-
+const SUPABASE_URL = 'https://mveqwpsmgtvlmzdcbxkj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12ZXF3cHNtZ3R2bG16ZGNieGtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODA4NzAsImV4cCI6MjA5ODY1Njg3MH0.JKecCwzBgS7cePVJVEhWnmLIGgcwunz-lU16EeRmeUY';
 // =================================================================
 // =================================================================
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
