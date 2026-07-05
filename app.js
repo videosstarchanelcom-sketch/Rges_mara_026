@@ -1,12 +1,16 @@
 // =================================================================
+// 1. CONFIGURACIÓN SUPABASE
 // =================================================================
 const SUPABASE_URL = 'https://mveqwpsmgtvlmzdcbxkj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12ZXF3cHNtZ3R2bG16ZGNieGtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODA4NzAsImV4cCI6MjA5ODY1Njg3MH0.JKecCwzBgS7cePVJVEhWnmLIGgcwunz-lU16EeRmeUY';
+
 // =================================================================
+// 2. INICIALIZAR SUPABASE
 // =================================================================
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // =================================================================
+// 3. REFERENCIAS DOM
 // =================================================================
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
@@ -55,6 +59,7 @@ const modalSaveText = $('#modalSaveText');
 const modalSaveSpinner = $('#modalSaveSpinner');
 
 // =================================================================
+// 4. TOAST SYSTEM
 // =================================================================
 function showToast(message, type = 'info') {
     const container = $('#toastContainer');
@@ -76,6 +81,7 @@ function showToast(message, type = 'info') {
 }
 
 // =================================================================
+// 5. AUTENTICACIÓN
 // =================================================================
 async function handleLogin(e) {
     e.preventDefault();
@@ -126,6 +132,7 @@ async function handleLogout() {
 }
 
 // =================================================================
+// 6. CRUD: OBTENER ALUMNOS
 // =================================================================
 let allStudents = [];
 
@@ -145,6 +152,7 @@ async function fetchStudents() {
 }
 
 // =================================================================
+// 7. RENDER: TABLA + ESTADÍSTICAS
 // =================================================================
 function renderStudents(list) {
     const data = list || allStudents;
@@ -194,7 +202,6 @@ function renderStudents(list) {
     studentsBody.innerHTML = html;
     updateStats(data);
 
-    // Eventos botones edit/delete
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', () => openEditModal(btn.dataset.id));
     });
@@ -227,6 +234,7 @@ function updateStats(data) {
 }
 
 // =================================================================
+// 8. CRUD: AGREGAR / ACTUALIZAR / ELIMINAR
 // =================================================================
 async function saveStudent(data) {
     const id = data.id || null;
@@ -245,7 +253,6 @@ async function saveStudent(data) {
     try {
         let result;
         if (id) {
-            // Actualizar
             result = await supabaseClient
                 .from('alumnos')
                 .update(payload)
@@ -253,7 +260,6 @@ async function saveStudent(data) {
                 .select()
                 .single();
         } else {
-            // Insertar
             result = await supabaseClient
                 .from('alumnos')
                 .insert(payload)
@@ -286,6 +292,7 @@ async function handleDelete(id) {
 }
 
 // =================================================================
+// 9. REFRESCAR DATOS Y RENDER
 // =================================================================
 async function refreshData() {
     await fetchStudents();
@@ -304,6 +311,7 @@ function filterStudents(list) {
 }
 
 // =================================================================
+// 10. MODAL: ABRIR / CERRAR
 // =================================================================
 function openModal(title, data = null) {
     modalTitle.textContent = title;
@@ -320,7 +328,6 @@ function openModal(title, data = null) {
     modal.classList.remove('hidden');
     modalBox.classList.remove('closing');
     modalBox.style.animation = 'slideUp 0.3s ease';
-    // focus
     setTimeout(() => sNombre.focus(), 100);
 }
 
@@ -349,6 +356,7 @@ function openEditModal(id) {
 }
 
 // =================================================================
+// 11. CALCULAR EDAD AUTOMÁTICA
 // =================================================================
 function calcularEdad() {
     const fecha = sFechaNac.value;
@@ -365,6 +373,7 @@ function calcularEdad() {
 }
 
 // =================================================================
+// 12. FORMATEAR FECHA
 // =================================================================
 function formatDate(dateStr) {
     if (!dateStr) return '—';
@@ -375,6 +384,7 @@ function formatDate(dateStr) {
 }
 
 // =================================================================
+// 13. ESCAPE HTML
 // =================================================================
 function escHtml(str) {
     if (!str) return '';
@@ -383,6 +393,7 @@ function escHtml(str) {
 }
 
 // =================================================================
+// 14. EVENTOS: LOGIN, LOGOUT, BUSCAR, MODAL, FORM
 // =================================================================
 loginForm.addEventListener('submit', handleLogin);
 logoutBtn.addEventListener('click', handleLogout);
@@ -450,6 +461,7 @@ studentForm.addEventListener('submit', async (e) => {
 });
 
 // =================================================================
+// 15. VERIFICAR SESIÓN AL CARGAR
 // =================================================================
 async function checkSession() {
     try {
@@ -469,7 +481,6 @@ async function checkSession() {
 
 async function loadApp() {
     try {
-        // Obtener usuario
         const { data: userData } = await supabaseClient.auth.getUser();
         if (userData?.user?.email) {
             userBadge.textContent = `👤 ${userData.user.email}`;
@@ -485,39 +496,33 @@ async function loadApp() {
 }
 
 // =================================================================
-// 16. EXPORTACIÓN DE DATOS (menú desplegable y eventos)
+// 16. EXPORTACIÓN DE DATOS
 // =================================================================
 const exportBtn = document.getElementById('exportBtn');
 const exportDropdown = document.getElementById('exportDropdown');
 
-// Toggle del menú desplegable
 exportBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelector('.dropdown').classList.toggle('show');
 });
 
-// Cerrar dropdown al hacer clic fuera
 document.addEventListener('click', () => {
     document.querySelector('.dropdown')?.classList.remove('show');
 });
 
-// Manejar clics en opciones de exportación
 exportDropdown.addEventListener('click', async (e) => {
     e.preventDefault();
     const format = e.target.dataset.format;
     if (!format) return;
 
-    // Obtener datos actuales (filtrados por búsqueda)
     const dataToExport = filterStudents(allStudents);
     if (!dataToExport || !dataToExport.length) {
         showToast('No hay datos para exportar.', 'warning');
         return;
     }
 
-    // Cerrar dropdown
     document.querySelector('.dropdown').classList.remove('show');
 
-    // Exportar según formato
     try {
         switch (format) {
             case 'csv':
@@ -538,15 +543,14 @@ exportDropdown.addEventListener('click', async (e) => {
 });
 
 // =================================================================
+// 17. INICIO
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Mostrar login por defecto, app oculta
     loginView.classList.remove('hidden');
     appView.classList.add('hidden');
     checkSession();
 });
 
-// Atajo: tecla Escape cierra modal
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
         closeModal();
