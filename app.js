@@ -485,6 +485,59 @@ async function loadApp() {
 }
 
 // =================================================================
+// 16. EXPORTACIÓN DE DATOS (menú desplegable y eventos)
+// =================================================================
+const exportBtn = document.getElementById('exportBtn');
+const exportDropdown = document.getElementById('exportDropdown');
+
+// Toggle del menú desplegable
+exportBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelector('.dropdown').classList.toggle('show');
+});
+
+// Cerrar dropdown al hacer clic fuera
+document.addEventListener('click', () => {
+    document.querySelector('.dropdown')?.classList.remove('show');
+});
+
+// Manejar clics en opciones de exportación
+exportDropdown.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const format = e.target.dataset.format;
+    if (!format) return;
+
+    // Obtener datos actuales (filtrados por búsqueda)
+    const dataToExport = filterStudents(allStudents);
+    if (!dataToExport || !dataToExport.length) {
+        showToast('No hay datos para exportar.', 'warning');
+        return;
+    }
+
+    // Cerrar dropdown
+    document.querySelector('.dropdown').classList.remove('show');
+
+    // Exportar según formato
+    try {
+        switch (format) {
+            case 'csv':
+                await window.exportToCSV(dataToExport);
+                break;
+            case 'excel':
+                await window.exportToExcel(dataToExport);
+                break;
+            case 'pdf':
+                await window.exportToPDF(dataToExport);
+                break;
+            default:
+                showToast('Formato no soportado.', 'error');
+        }
+    } catch (err) {
+        showToast('Error en exportación: ' + err.message, 'error');
+    }
+});
+
+// =================================================================
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     // Mostrar login por defecto, app oculta
