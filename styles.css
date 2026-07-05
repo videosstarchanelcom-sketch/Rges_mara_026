@@ -585,3 +585,37 @@ tr:hover td {
     font-size: 14px;
     color: #334155;
 }
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9fafc;
+    min-width: 120px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    z-index: 1;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+.dropdown-content a {
+    color: #1e293b;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.dropdown-content a:hover {
+    background-color: #eef2ff;
+    color: #2563eb;
+}
+.dropdown.show .dropdown-content {
+    display: block;
+}
