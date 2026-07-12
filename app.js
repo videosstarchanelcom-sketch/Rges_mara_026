@@ -57,6 +57,8 @@ const sCedulaRep = $('#sCedulaRep');
 const modalSaveBtn = $('#modalSaveBtn');
 const modalSaveText = $('#modalSaveText');
 const modalSaveSpinner = $('#modalSaveSpinner');
+const sGrado = $('#sGrado');
+const sSeccion = $('#sSeccion');
 
 // =================================================================
 // 4. TOAST SYSTEM
