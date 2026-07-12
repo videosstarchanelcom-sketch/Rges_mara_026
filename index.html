@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Gestión de Inscripciones Escolar</title>
+    <title>Gestión de Matrícula Escolar</title>
     <!-- Supabase client (v2) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
@@ -28,7 +28,7 @@
                 <div class="login-logo">
                     <span>🏫</span>
                 </div>
-                <h1 class="login-title text-center">Gestion Escolar</h1>
+                <h1 class="login-title text-center">Matrícula Escolar</h1>
                 <p class="login-sub text-center">Acceso restringido · personal autorizado</p>
 
                 <form id="loginForm" autocomplete="off">
@@ -57,8 +57,8 @@
             <!-- HEADER -->
             <header class="app-header flex-between">
                 <div>
-                    <h1>📋 Gestión de Ingresados</h1>
-                    <div class="subtitle">Año Escolar 2025-2026 · 4to grado "A"</div>
+                    <h1>📋 Gestión de Matrícula</h1>
+                    <div class="subtitle" id="institutionSubtitle">Año Escolar 2025-2026</div>
                 </div>
                 <div class="flex gap-1">
                     <span class="user-badge" id="userBadge">👤 Admin</span>
@@ -110,7 +110,7 @@
                             <a href="#" data-format="json">💾 JSON (Respaldo)</a>
                             <a href="#" data-format="html">🌐 HTML (Vista previa)</a>
                             <a href="#" data-format="txt">📃 TXT (Texto plano)</a>
-                            <a href="#" data-format="md">📓 Markdown (Documentación)</a>
+                            <a href="#" data-format="md">📓 Markdown</a>
                         </div>
                     </div>
                     <button class="btn btn-success" id="addStudentBtn">+ Nuevo Alumno</button>
@@ -197,6 +197,29 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="sGrado">Grado *</label>
+                        <select id="sGrado" required>
+                            <option value="">Seleccione</option>
+                            <option value="1ro">1ro</option>
+                            <option value="2do">2do</option>
+                            <option value="3ro">3ro</option>
+                            <option value="4to">4to</option>
+                            <option value="5to">5to</option>
+                            <option value="6to">6to</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sSeccion">Sección *</label>
+                        <select id="sSeccion" required>
+                            <option value="">Seleccione</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="sRepresentante">Representante *</label>
                         <input type="text" id="sRepresentante" placeholder="Nombre completo" required />
                     </div>
@@ -220,7 +243,7 @@
     <!-- ============================================================ -->
     <!-- JS externo -->
     <!-- ============================================================ -->
-    <script src="app.js?v=2"></script> <!--No cambiar o modificar-->
+    <script src="app.js"></script>
     <script src="export.js"></script>
 
 </body>
