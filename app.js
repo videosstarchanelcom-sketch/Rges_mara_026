@@ -431,11 +431,14 @@ studentForm.addEventListener('submit', async (e) => {
     const indigena = sIndigena.value;
     const representante = sRepresentante.value.trim();
     const cedula_rep = sCedulaRep.value.trim();
+    const grado = sGrado.value;
+    const seccion = sSeccion.value;
 
-    if (!nombre || !cedula_escolar || !fecha_nac || !sexo || !representante) {
-        showToast('Completa todos los campos obligatorios (*).', 'warning');
-        return;
-    }
+    // Validación
+if (!nombre || !cedula_escolar || !fecha_nac || !sexo || !grado || !seccion || !representante) {
+    showToast('Completa todos los campos obligatorios (*).', 'warning');
+    return;
+}
 
     const edad = parseInt(sEdad.value) || null;
 
@@ -453,6 +456,8 @@ studentForm.addEventListener('submit', async (e) => {
             lugar_nac,
             sexo,
             indigena,
+            grado,
+            seccion,
             representante,
             cedula_rep,
         });
