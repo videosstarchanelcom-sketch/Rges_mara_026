@@ -568,24 +568,6 @@ tr:hover td {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* small helper for checkbox inline */
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-top: 6px;
-}
-.checkbox-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #2563eb;
-}
-.checkbox-group label {
-    font-weight: 400;
-    font-size: 14px;
-    color: #334155;
-}
-
 /* Dropdown */
 .dropdown {
     position: relative;
@@ -596,7 +578,7 @@ tr:hover td {
     position: absolute;
     right: 0;
     background-color: #f9fafc;
-    min-width: 120px;
+    min-width: 180px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     border-radius: 12px;
     z-index: 1;
