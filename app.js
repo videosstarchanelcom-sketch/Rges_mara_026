@@ -248,6 +248,8 @@ async function saveStudent(data) {
         lugar_nac: data.lugar_nac ? data.lugar_nac.trim() : '',
         sexo: data.sexo,
         indigena: data.indigena || '',
+        grado: data.grado || '',
+        seccion: data.seccion || '',
         representante: data.representante.trim(),
         cedula_rep: data.cedula_rep ? data.cedula_rep.trim() : '',
     };
@@ -325,6 +327,8 @@ function openModal(title, data = null) {
     sLugarNac.value = data?.lugar_nac || '';
     sSexo.value = data?.sexo || '';
     sIndigena.value = data?.indigena || '';
+    sGrado.value = data?.grado || '';
+    sSeccion.value = data?.seccion || '';
     sRepresentante.value = data?.representante || '';
     sCedulaRep.value = data?.cedula_rep || '';
     modal.classList.remove('hidden');
