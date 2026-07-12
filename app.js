@@ -183,25 +183,25 @@ function renderStudents(list) {
         const sexoBadge = sexo !== '—' ? `<span class="badge badge-sexo">${sexo}</span>` : '—';
 
         html += `
-            <tr>
-                <td><strong>${num}</strong></td>
-                <td><strong>${escHtml(s.nombre)}</strong></td>
-                <td>${escHtml(s.cedula_escolar || '')}</td>
-                <td>${fecha}</td>
-                <td>${edad}</td>
-                <td>${sexoBadge}</td>
-                <td>${indBadge}</td>
-                <td>${escHtml(s.representante || '')}</td>
-                <td>${s.grado || ''}</td>
-                <td>${s.seccion || ''}</td>
-                <td>
-                    <div class="table-actions">
-                        <button class="btn btn-warning btn-sm edit-btn" data-id="${s.id}">✏️</button>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${s.id}">🗑️</button>
-                    </div>
-                </td>
-            </tr>
-        `;
+                <tr>
+                    <td><strong>${num}</strong></td>
+                    <td><strong>${escHtml(s.nombre)}</strong></td>
+                    <td>${escHtml(s.cedula_escolar || '')}</td>
+                    <td>${fecha}</td>
+                    <td>${edad}</td>
+                    <td>${sexoBadge}</td>
+                    <td>${indBadge}</td>
+                    <td>${s.grado || ''}</td>
+                    <td>${s.seccion || ''}</td>
+                    <td>${escHtml(s.representante || '')}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn btn-warning btn-sm edit-btn" data-id="${s.id}">✏️</button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="${s.id}">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
     });
     studentsBody.innerHTML = html;
     updateStats(data);
