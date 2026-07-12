@@ -6,15 +6,15 @@
 // 1. CONFIGURACIÓN INSTITUCIONAL (para encabezados)
 // ============================================================
 const SCHOOL_CONFIG = {
-    name: 'Unidad Educativa Nacional "Simón Bolívar"',
-    code: 'UE-12345',
-    address: 'Av. Principal, Parroquia El Valle, Caracas',
-    phone: '(0212) 555-1234',
-    email: 'uen.simonbolivar@edu.ve',
+    name: '',  // ← VACÍO para que el usuario complete
+    code: '',
+    address: '',
+    phone: '',
+    email: '',
     academicYear: '2025-2026',
-    grade: '4to',
-    section: 'A',
-    shift: 'Mañana'
+    grade: '',  // ← VACÍO
+    section: '', // ← VACÍO
+    shift: ''
 };
 
 // ============================================================
@@ -224,143 +224,164 @@ async function exportToPDF(data, filename = 'alumnos.pdf') {
 // ============================================================
 // 6. FORMATO DOCX (Word)
 // ============================================================
-async function exportToDOCX(data, filename = 'alumnos.docx') {
+async // ============================================================
+// 6. FORMATO DOCX (Word) - Versión mejorada con HTML
+// ============================================================
+function exportToDOCX(data, filename = 'alumnos.docx') {
     if (!data || !data.length) {
         alert('No hay datos para exportar.');
         return;
     }
 
     try {
-        if (typeof window.docx === 'undefined') {
-            await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js');
-        }
-
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, HeadingLevel, AlignmentType, convertInchesToTwip } = window.docx;
-
-        // Construir documento
-        const children = [];
-
-        // Título
-        children.push(
-            new Paragraph({
-                children: [
-                    new TextRun({ text: SCHOOL_CONFIG.name, bold: true, size: 32 })
-                ],
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 200 }
-            })
-        );
-
-        children.push(
-            new Paragraph({
-                children: [
-                    new TextRun({
-                        text: `Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"`,
-                        size: 24
-                    })
-                ],
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 100 }
-            })
-        );
-
-        children.push(
-            new Paragraph({
-                children: [
-                    new TextRun({ text: `Turno: ${SCHOOL_CONFIG.shift} · Tel: ${SCHOOL_CONFIG.phone} · Email: ${SCHOOL_CONFIG.email}`, size: 18, color: '666666' })
-                ],
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 300 }
-            })
-        );
-
-        children.push(
-            new Paragraph({
-                children: [
-                    new TextRun({ text: `Generado: ${getCurrentDate()}`, size: 18, color: '666666' })
-                ],
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 400 }
-            })
-        );
-
-        // Tabla
-        const tableRows = [
-            // Encabezados
-            new TableRow({
-                children: [
-                    'Nombre', 'Cédula', 'F.N.', 'Edad', 'Sexo', 'Indígena', 'Representante', 'Cédula Rep.'
-                ].map(text => new TableCell({
-                    children: [new Paragraph({
-                        children: [new TextRun({ text, bold: true, size: 20 })],
-                        alignment: AlignmentType.CENTER
-                    })],
-                    shading: { fill: 'e6e6e6' }
-                }))
-            }),
-            // Datos
-            ...data.map(s => new TableRow({
-                children: [
-                    s.nombre || '',
-                    s.cedula_escolar || '',
-                    s.fecha_nac || '',
-                    String(s.edad || ''),
-                    s.sexo || '',
-                    s.indigena || '',
-                    s.representante || '',
-                    s.cedula_rep || ''
-                ].map(text => new TableCell({
-                    children: [new Paragraph({
-                        children: [new TextRun({ text: String(text), size: 18 })],
-                        alignment: AlignmentType.CENTER
-                    })]
-                }))
-            }))
-        ];
-
-        children.push(
-            new Table({
-                rows: tableRows,
-                width: { size: 100, type: 'percentage' },
-                borders: {
-                    insideVertical: { style: BorderStyle.SINGLE, size: 1 },
-                    insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
-                    top: { style: BorderStyle.SINGLE, size: 1 },
-                    bottom: { style: BorderStyle.SINGLE, size: 1 },
-                    left: { style: BorderStyle.SINGLE, size: 1 },
-                    right: { style: BorderStyle.SINGLE, size: 1 }
+        // Construir HTML con estilo para Word
+        let html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+            <meta charset="UTF-8">
+            <title>Lista de Alumnos</title>
+            <!--[if gte mso 9]>
+            <xml>
+                <w:WordDocument>
+                    <w:View>Print</w:View>
+                    <w:Zoom>100</w:Zoom>
+                </w:WordDocument>
+            </xml>
+            <![endif]-->
+            <style>
+                /* Estilos para Word */
+                body { 
+                    font-family: 'Segoe UI', Arial, sans-serif; 
+                    margin: 40px;
+                    color: #1e293b;
                 }
-            })
-        );
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px solid #2563eb; 
+                    padding-bottom: 20px; 
+                    margin-bottom: 30px;
+                }
+                .header h1 { 
+                    font-size: 22pt; 
+                    color: #0f3b5e; 
+                    margin-bottom: 4px;
+                }
+                .header .subtitle { 
+                    font-size: 14pt; 
+                    color: #64748b; 
+                }
+                .header .info {
+                    font-size: 11pt;
+                    color: #475569;
+                    margin-top: 12px;
+                }
+                .header .info span { 
+                    margin: 0 10px; 
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    font-size: 10pt;
+                    margin-top: 20px;
+                }
+                th { 
+                    background: #2563eb; 
+                    color: white; 
+                    padding: 8px; 
+                    text-align: left; 
+                    font-weight: bold;
+                    border: 1px solid #2563eb;
+                }
+                td { 
+                    padding: 6px 8px; 
+                    border: 1px solid #d1d5db;
+                }
+                tr:nth-child(even) { 
+                    background: #f8fafc; 
+                }
+                .footer { 
+                    margin-top: 30px; 
+                    padding-top: 20px;
+                    border-top: 1px solid #d1d5db;
+                    color: #64748b; 
+                    font-size: 10pt;
+                    text-align: center;
+                }
+                .badge {
+                    display: inline-block;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: 9pt;
+                    font-weight: bold;
+                }
+                .badge-indigena { background: #fef3c7; color: #92400e; }
+                .badge-sexo { background: #dbeafe; color: #1e40af; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>${SCHOOL_CONFIG.name || 'INSTITUCIÓN EDUCATIVA'}</h1>
+                <div class="subtitle">Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}</div>
+                <div class="info">
+                    <span>📅 ${getCurrentDate()}</span>
+                    <span>📞 ${SCHOOL_CONFIG.phone || ''}</span>
+                    <span>✉️ ${SCHOOL_CONFIG.email || ''}</span>
+                </div>
+            </div>
+            
+            <h2 style="font-size:14pt; color:#0f3b5e; margin-bottom:16px;">📋 Lista de Alumnos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Cédula Escolar</th>
+                        <th>F.N.</th>
+                        <th>Edad</th>
+                        <th>Sexo</th>
+                        <th>Indígena</th>
+                        <th>Representante</th>
+                        <th>Cédula Rep.</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
-        // Pie
-        children.push(
-            new Paragraph({
-                children: [
-                    new TextRun({ text: `Total de alumnos: ${data.length}`, size: 18, color: '666666' })
-                ],
-                alignment: AlignmentType.CENTER,
-                spacing: { before: 200 }
-            })
-        );
-
-        const doc = new Document({
-            sections: [{
-                properties: {
-                    page: {
-                        margin: {
-                            top: convertInchesToTwip(0.8),
-                            bottom: convertInchesToTwip(0.8),
-                            left: convertInchesToTwip(0.8),
-                            right: convertInchesToTwip(0.8)
-                        }
-                    }
-                },
-                children: children
-            }]
+        data.forEach((s, i) => {
+            const sexoBadge = s.sexo ? `<span class="badge badge-sexo">${s.sexo}</span>` : '—';
+            const indBadge = s.indigena ? `<span class="badge badge-indigena">${s.indigena}</span>` : '—';
+            html += `
+                <tr>
+                    <td style="text-align:center;">${i + 1}</td>
+                    <td><strong>${escHtml(s.nombre || '')}</strong></td>
+                    <td>${escHtml(s.cedula_escolar || '')}</td>
+                    <td>${s.fecha_nac || ''}</td>
+                    <td style="text-align:center;">${s.edad || ''}</td>
+                    <td style="text-align:center;">${sexoBadge}</td>
+                    <td style="text-align:center;">${indBadge}</td>
+                    <td>${escHtml(s.representante || '')}</td>
+                    <td>${escHtml(s.cedula_rep || '')}</td>
+                </tr>
+            `;
         });
 
-        const blob = await Packer.toBlob(doc);
+        html += `
+                </tbody>
+            </table>
+            <div class="footer">
+                <p>Total de alumnos: <strong>${data.length}</strong></p>
+                <p>${SCHOOL_CONFIG.name || 'Institución Educativa'} · ${SCHOOL_CONFIG.address || ''}</p>
+            </div>
+        </body>
+        </html>
+        `;
+
+        // Crear archivo DOCX (Word acepta HTML con el header adecuado)
+        const blob = new Blob([html], { 
+            type: 'application/msword;charset=utf-8' 
+        });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = filename;
