@@ -3,17 +3,17 @@
 // ============================================================
 
 // ============================================================
-// 1. CONFIGURACIÓN INSTITUCIONAL (para encabezados)
+// 1. CONFIGURACIÓN INSTITUCIONAL (vacía para que el usuario complete)
 // ============================================================
 const SCHOOL_CONFIG = {
-    name: '',  // ← VACÍO para que el usuario complete
+    name: '',  // ← COMPLETAR CON NOMBRE DE LA ESCUELA
     code: '',
     address: '',
     phone: '',
     email: '',
     academicYear: '2025-2026',
-    grade: '',  // ← VACÍO
-    section: '', // ← VACÍO
+    grade: '',
+    section: '',
     shift: ''
 };
 
@@ -36,14 +36,6 @@ function escHtml(str) {
     return str.replace(/[&<>"']/g, m => map[m]);
 }
 
-function getSchoolHeader() {
-    return `${SCHOOL_CONFIG.name}\n` +
-           `Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"\n` +
-           `Turno: ${SCHOOL_CONFIG.shift}\n` +
-           `Tel: ${SCHOOL_CONFIG.phone} · Email: ${SCHOOL_CONFIG.email}\n` +
-           `-`.repeat(60);
-}
-
 function getCurrentDate() {
     return new Date().toLocaleDateString('es-ES', {
         year: 'numeric',
@@ -53,7 +45,7 @@ function getCurrentDate() {
 }
 
 // ============================================================
-// 3. FORMATO CSV (con encabezado institucional)
+// 3. FORMATO CSV
 // ============================================================
 function exportToCSV(data, filename = 'alumnos.csv') {
     if (!data || !data.length) {
@@ -61,7 +53,7 @@ function exportToCSV(data, filename = 'alumnos.csv') {
         return;
     }
 
-    const headers = ['Nombre', 'Cédula Escolar', 'Fecha Nac.', 'Edad', 'Sexo', 'Indígena', 'Representante', 'Cédula Rep.'];
+    const headers = ['Nombre', 'Cédula Escolar', 'Fecha Nac.', 'Edad', 'Sexo', 'Indígena', 'Grado', 'Sección', 'Representante', 'Cédula Rep.'];
     const rows = data.map(s => [
         s.nombre || '',
         s.cedula_escolar || '',
@@ -69,17 +61,17 @@ function exportToCSV(data, filename = 'alumnos.csv') {
         s.edad || '',
         s.sexo || '',
         s.indigena || '',
+        s.grado || '',
+        s.seccion || '',
         s.representante || '',
         s.cedula_rep || ''
     ]);
 
     let csv = '';
-    // Encabezado institucional (comentado)
-    csv += `# ${SCHOOL_CONFIG.name}\n`;
-    csv += `# Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"\n`;
+    csv += `# ${SCHOOL_CONFIG.name || 'Institución Educativa'}\n`;
+    csv += `# Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}\n`;
     csv += `# Generado: ${getCurrentDate()}\n`;
     csv += '# ' + '-'.repeat(50) + '\n';
-    // Datos
     csv += headers.join(',') + '\n';
     rows.forEach(row => {
         const escaped = row.map(cell => {
@@ -118,11 +110,11 @@ async function exportToExcel(data, filename = 'alumnos.xlsx') {
         }
 
         const worksheetData = [
-            [SCHOOL_CONFIG.name],
-            [`Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"`],
+            [SCHOOL_CONFIG.name || 'Institución Educativa'],
+            [`Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}`],
             [`Generado: ${getCurrentDate()}`],
             [],
-            ['Nombre', 'Cédula Escolar', 'Fecha Nac.', 'Edad', 'Sexo', 'Indígena', 'Representante', 'Cédula Rep.']
+            ['Nombre', 'Cédula Escolar', 'Fecha Nac.', 'Edad', 'Sexo', 'Indígena', 'Grado', 'Sección', 'Representante', 'Cédula Rep.']
         ];
         data.forEach(s => {
             worksheetData.push([
@@ -132,6 +124,8 @@ async function exportToExcel(data, filename = 'alumnos.xlsx') {
                 s.edad || '',
                 s.sexo || '',
                 s.indigena || '',
+                s.grado || '',
+                s.seccion || '',
                 s.representante || '',
                 s.cedula_rep || ''
             ]);
@@ -169,17 +163,14 @@ async function exportToPDF(data, filename = 'alumnos.pdf') {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('landscape', 'mm', 'a4');
 
-        // Título institucional
         doc.setFontSize(16);
-        doc.text(SCHOOL_CONFIG.name, 14, 18);
+        doc.text(SCHOOL_CONFIG.name || 'Institución Educativa', 14, 18);
         doc.setFontSize(12);
-        doc.text(`Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"`, 14, 26);
+        doc.text(`Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}`, 14, 26);
         doc.setFontSize(10);
-        doc.text(`Turno: ${SCHOOL_CONFIG.shift} · Tel: ${SCHOOL_CONFIG.phone}`, 14, 32);
-        doc.text(`Generado: ${getCurrentDate()}`, 14, 38);
+        doc.text(`Generado: ${getCurrentDate()}`, 14, 32);
 
-        // Tabla
-        const tableHeaders = [['Nombre', 'Cédula', 'F.N.', 'Edad', 'Sexo', 'Indígena', 'Representante', 'Cédula Rep.']];
+        const tableHeaders = [['Nombre', 'Cédula', 'F.N.', 'Edad', 'Sexo', 'Indígena', 'Grado', 'Sección', 'Representante', 'Cédula Rep.']];
         const tableRows = data.map(s => [
             s.nombre || '',
             s.cedula_escolar || '',
@@ -187,6 +178,8 @@ async function exportToPDF(data, filename = 'alumnos.pdf') {
             s.edad || '',
             s.sexo || '',
             s.indigena || '',
+            s.grado || '',
+            s.seccion || '',
             s.representante || '',
             s.cedula_rep || ''
         ]);
@@ -194,22 +187,23 @@ async function exportToPDF(data, filename = 'alumnos.pdf') {
         doc.autoTable({
             head: tableHeaders,
             body: tableRows,
-            startY: 44,
-            styles: { fontSize: 8, cellPadding: 2 },
+            startY: 38,
+            styles: { fontSize: 7, cellPadding: 2 },
             headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] },
             columnStyles: {
-                0: { cellWidth: 45 },
-                1: { cellWidth: 22 },
-                2: { cellWidth: 18 },
-                3: { cellWidth: 14 },
-                4: { cellWidth: 14 },
-                5: { cellWidth: 22 },
-                6: { cellWidth: 35 },
-                7: { cellWidth: 22 }
+                0: { cellWidth: 40 },
+                1: { cellWidth: 18 },
+                2: { cellWidth: 16 },
+                3: { cellWidth: 12 },
+                4: { cellWidth: 12 },
+                5: { cellWidth: 18 },
+                6: { cellWidth: 16 },
+                7: { cellWidth: 14 },
+                8: { cellWidth: 30 },
+                9: { cellWidth: 18 }
             }
         });
 
-        // Pie de página
         doc.setFontSize(8);
         doc.text(`Total de alumnos: ${data.length}`, 14, doc.internal.pageSize.height - 8);
 
@@ -222,9 +216,6 @@ async function exportToPDF(data, filename = 'alumnos.pdf') {
 }
 
 // ============================================================
-// 6. FORMATO DOCX (Word)
-// ============================================================
-async // ============================================================
 // 6. FORMATO DOCX (Word) - Versión mejorada con HTML
 // ============================================================
 function exportToDOCX(data, filename = 'alumnos.docx') {
@@ -234,7 +225,6 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
     }
 
     try {
-        // Construir HTML con estilo para Word
         let html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' 
               xmlns:w='urn:schemas-microsoft-com:office:word' 
@@ -251,7 +241,6 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
             </xml>
             <![endif]-->
             <style>
-                /* Estilos para Word */
                 body { 
                     font-family: 'Segoe UI', Arial, sans-serif; 
                     margin: 40px;
@@ -276,9 +265,6 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                     font-size: 11pt;
                     color: #475569;
                     margin-top: 12px;
-                }
-                .header .info span { 
-                    margin: 0 10px; 
                 }
                 table { 
                     width: 100%; 
@@ -322,7 +308,7 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
         </head>
         <body>
             <div class="header">
-                <h1>${SCHOOL_CONFIG.name || 'INSTITUCIÓN EDUCATIVA'}</h1>
+                <h1>${SCHOOL_CONFIG.name || 'Institución Educativa'}</h1>
                 <div class="subtitle">Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}</div>
                 <div class="info">
                     <span>📅 ${getCurrentDate()}</span>
@@ -342,6 +328,8 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                         <th>Edad</th>
                         <th>Sexo</th>
                         <th>Indígena</th>
+                        <th>Grado</th>
+                        <th>Sección</th>
                         <th>Representante</th>
                         <th>Cédula Rep.</th>
                     </tr>
@@ -361,6 +349,8 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                     <td style="text-align:center;">${s.edad || ''}</td>
                     <td style="text-align:center;">${sexoBadge}</td>
                     <td style="text-align:center;">${indBadge}</td>
+                    <td style="text-align:center;">${s.grado || ''}</td>
+                    <td style="text-align:center;">${s.seccion || ''}</td>
                     <td>${escHtml(s.representante || '')}</td>
                     <td>${escHtml(s.cedula_rep || '')}</td>
                 </tr>
@@ -378,7 +368,6 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
         </html>
         `;
 
-        // Crear archivo DOCX (Word acepta HTML con el header adecuado)
         const blob = new Blob([html], { 
             type: 'application/msword;charset=utf-8' 
         });
@@ -398,7 +387,7 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
 }
 
 // ============================================================
-// 7. FORMATO JSON (Respaldo completo)
+// 7. FORMATO JSON (Respaldo)
 // ============================================================
 function exportToJSON(data, filename = 'alumnos_backup.json') {
     if (!data || !data.length) {
@@ -409,9 +398,8 @@ function exportToJSON(data, filename = 'alumnos_backup.json') {
     try {
         const exportData = {
             metadata: {
-                school: SCHOOL_CONFIG.name,
-                academicYear: SCHOOL_CONFIG.academicYear,
-                grade: `${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"`,
+                school: SCHOOL_CONFIG.name || 'Institución Educativa',
+                academicYear: SCHOOL_CONFIG.academicYear || '2025-2026',
                 exportedAt: new Date().toISOString(),
                 totalStudents: data.length
             },
@@ -451,7 +439,7 @@ function exportToHTML(data, filename = 'alumnos.html') {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Lista de Alumnos - ${SCHOOL_CONFIG.name}</title>
+            <title>Lista de Alumnos</title>
             <style>
                 * { box-sizing: border-box; }
                 body { 
@@ -539,13 +527,12 @@ function exportToHTML(data, filename = 'alumnos.html') {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>${escHtml(SCHOOL_CONFIG.name)}</h1>
-                    <div class="subtitle">Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"</div>
+                    <h1>${escHtml(SCHOOL_CONFIG.name || 'Institución Educativa')}</h1>
+                    <div class="subtitle">Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}</div>
                     <div class="info">
                         <span>📅 ${getCurrentDate()}</span>
-                        <span>🕒 Turno: ${SCHOOL_CONFIG.shift}</span>
-                        <span>📞 ${SCHOOL_CONFIG.phone}</span>
-                        <span>✉️ ${SCHOOL_CONFIG.email}</span>
+                        <span>📞 ${SCHOOL_CONFIG.phone || ''}</span>
+                        <span>✉️ ${SCHOOL_CONFIG.email || ''}</span>
                     </div>
                 </div>
                 
@@ -560,6 +547,8 @@ function exportToHTML(data, filename = 'alumnos.html') {
                             <th>Edad</th>
                             <th>Sexo</th>
                             <th>Indígena</th>
+                            <th>Grado</th>
+                            <th>Sección</th>
                             <th>Representante</th>
                             <th>Cédula Rep.</th>
                         </tr>
@@ -579,6 +568,8 @@ function exportToHTML(data, filename = 'alumnos.html') {
                     <td>${s.edad || ''}</td>
                     <td>${sexoBadge}</td>
                     <td>${indBadge}</td>
+                    <td>${s.grado || ''}</td>
+                    <td>${s.seccion || ''}</td>
                     <td>${escHtml(s.representante || '')}</td>
                     <td>${escHtml(s.cedula_rep || '')}</td>
                 </tr>
@@ -590,7 +581,7 @@ function exportToHTML(data, filename = 'alumnos.html') {
                 </table>
                 <div class="footer">
                     <span>Total de alumnos: <strong>${data.length}</strong></span>
-                    <span>${SCHOOL_CONFIG.name} · ${SCHOOL_CONFIG.address}</span>
+                    <span>${SCHOOL_CONFIG.name || 'Institución Educativa'} · ${SCHOOL_CONFIG.address || ''}</span>
                 </div>
             </div>
         </body>
@@ -614,7 +605,7 @@ function exportToHTML(data, filename = 'alumnos.html') {
 }
 
 // ============================================================
-// 9. FORMATO TXT (Texto plano con formato)
+// 9. FORMATO TXT (Texto plano)
 // ============================================================
 function exportToTXT(data, filename = 'alumnos.txt') {
     if (!data || !data.length) {
@@ -624,26 +615,26 @@ function exportToTXT(data, filename = 'alumnos.txt') {
 
     try {
         let txt = '';
-        txt += '='.repeat(70) + '\n';
-        txt += `  ${SCHOOL_CONFIG.name}\n`;
-        txt += `  Año Escolar ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"\n`;
-        txt += `  Turno: ${SCHOOL_CONFIG.shift} · Tel: ${SCHOOL_CONFIG.phone}\n`;
+        txt += '='.repeat(80) + '\n';
+        txt += `  ${SCHOOL_CONFIG.name || 'Institución Educativa'}\n`;
+        txt += `  Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}\n`;
         txt += `  Generado: ${getCurrentDate()}\n`;
-        txt += '='.repeat(70) + '\n\n';
+        txt += '='.repeat(80) + '\n\n';
         txt += ' LISTA DE ALUMNOS\n';
-        txt += '-'.repeat(70) + '\n\n';
+        txt += '-'.repeat(80) + '\n\n';
 
         data.forEach((s, i) => {
             txt += `${String(i + 1).padStart(3)}. ${(s.nombre || '').padEnd(35)} `;
             txt += `Céd: ${(s.cedula_escolar || '').padEnd(10)} `;
             txt += `Sexo: ${(s.sexo || '-').padEnd(3)} `;
-            txt += `Ind: ${(s.indigena || '-').padEnd(10)} `;
+            txt += `Grado: ${(s.grado || '').padEnd(6)} `;
+            txt += `Sec: ${(s.seccion || '').padEnd(3)} `;
             txt += `Rep: ${(s.representante || '').padEnd(20)}\n`;
         });
 
-        txt += '\n' + '-'.repeat(70) + '\n';
+        txt += '\n' + '-'.repeat(80) + '\n';
         txt += `Total de alumnos: ${data.length}\n`;
-        txt += '='.repeat(70) + '\n';
+        txt += '='.repeat(80) + '\n';
 
         const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
@@ -662,7 +653,7 @@ function exportToTXT(data, filename = 'alumnos.txt') {
 }
 
 // ============================================================
-// 10. FORMATO MARKDOWN (para documentación)
+// 10. FORMATO MARKDOWN
 // ============================================================
 function exportToMD(data, filename = 'alumnos.md') {
     if (!data || !data.length) {
@@ -672,24 +663,21 @@ function exportToMD(data, filename = 'alumnos.md') {
 
     try {
         let md = '';
-        md += `# ${SCHOOL_CONFIG.name}\n\n`;
-        md += `**Año Escolar:** ${SCHOOL_CONFIG.academicYear} · ${SCHOOL_CONFIG.grade}° Grado "${SCHOOL_CONFIG.section}"\n\n`;
-        md += `**Turno:** ${SCHOOL_CONFIG.shift}  \n`;
-        md += `**Teléfono:** ${SCHOOL_CONFIG.phone}  \n`;
-        md += `**Email:** ${SCHOOL_CONFIG.email}  \n`;
-        md += `**Generado:** ${getCurrentDate()}  \n\n`;
+        md += `# ${SCHOOL_CONFIG.name || 'Institución Educativa'}\n\n`;
+        md += `**Año Escolar:** ${SCHOOL_CONFIG.academicYear || '2025-2026'}\n\n`;
+        md += `**Generado:** ${getCurrentDate()}\n\n`;
         md += `---\n\n`;
         md += `## 📋 Lista de Alumnos\n\n`;
-        md += `| # | Nombre | Cédula Escolar | F.N. | Edad | Sexo | Indígena | Representante | Cédula Rep. |\n`;
-        md += `|---|--------|----------------|------|------|------|----------|---------------|-------------|\n`;
+        md += `| # | Nombre | Cédula | F.N. | Edad | Sexo | Indígena | Grado | Sección | Representante | Cédula Rep. |\n`;
+        md += `|---|--------|--------|------|------|------|----------|-------|---------|---------------|-------------|\n`;
 
         data.forEach((s, i) => {
-            md += `| ${i + 1} | ${s.nombre || ''} | ${s.cedula_escolar || ''} | ${s.fecha_nac || ''} | ${s.edad || ''} | ${s.sexo || '-'} | ${s.indigena || '-'} | ${s.representante || ''} | ${s.cedula_rep || ''} |\n`;
+            md += `| ${i + 1} | ${s.nombre || ''} | ${s.cedula_escolar || ''} | ${s.fecha_nac || ''} | ${s.edad || ''} | ${s.sexo || '-'} | ${s.indigena || '-'} | ${s.grado || ''} | ${s.seccion || ''} | ${s.representante || ''} | ${s.cedula_rep || ''} |\n`;
         });
 
         md += `\n**Total de alumnos:** ${data.length}\n`;
         md += `\n---\n`;
-        md += `*${SCHOOL_CONFIG.name} · ${SCHOOL_CONFIG.address}*\n`;
+        md += `*${SCHOOL_CONFIG.name || 'Institución Educativa'} · ${SCHOOL_CONFIG.address || ''}*\n`;
 
         const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
         const link = document.createElement('a');
