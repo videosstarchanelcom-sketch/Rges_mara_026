@@ -192,6 +192,8 @@ function renderStudents(list) {
                 <td>${sexoBadge}</td>
                 <td>${indBadge}</td>
                 <td>${escHtml(s.representante || '')}</td>
+                <td>${s.grado || ''}</td>
+                <td>${s.seccion || ''}</td>
                 <td>
                     <div class="table-actions">
                         <button class="btn btn-warning btn-sm edit-btn" data-id="${s.id}">✏️</button>
