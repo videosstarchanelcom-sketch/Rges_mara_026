@@ -525,18 +525,33 @@ exportDropdown.addEventListener('click', async (e) => {
 
     try {
         switch (format) {
-            case 'csv':
-                await window.exportToCSV(dataToExport);
-                break;
-            case 'excel':
-                await window.exportToExcel(dataToExport);
-                break;
-            case 'pdf':
-                await window.exportToPDF(dataToExport);
-                break;
-            default:
-                showToast('Formato no soportado.', 'error');
-        }
+    case 'csv':
+        await window.exportToCSV(dataToExport);
+        break;
+    case 'excel':
+        await window.exportToExcel(dataToExport);
+        break;
+    case 'pdf':
+        await window.exportToPDF(dataToExport);
+        break;
+    case 'docx':
+        await window.exportToDOCX(dataToExport);
+        break;
+    case 'json':
+        await window.exportToJSON(dataToExport);
+        break;
+    case 'html':
+        await window.exportToHTML(dataToExport);
+        break;
+    case 'txt':
+        await window.exportToTXT(dataToExport);
+        break;
+    case 'md':
+        await window.exportToMD(dataToExport);
+        break;
+    default:
+        showToast('Formato no soportado.', 'error');
+}
     } catch (err) {
         showToast('Error en exportación: ' + err.message, 'error');
     }
