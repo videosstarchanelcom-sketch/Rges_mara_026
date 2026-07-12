@@ -218,31 +218,228 @@ async function exportToPDF(data, filename = 'alumnos.pdf') {
 // ============================================================
 // 6. FORMATO DOCX (Word) - Versión mejorada con HTML
 // ============================================================
-function exportToDOCX(data, filename = 'alumnos.docx') {
+// ============================================================
+// 6. FORMATO DOCX (Word) - Versión estable con librería docx.js
+// ============================================================
+async function exportToDOCX(data, filename = 'alumnos.docx') {
     if (!data || !data.length) {
         alert('No hay datos para exportar.');
         return;
     }
 
     try {
+        // Cargar la librería docx.js desde CDN (versión estable)
+        if (typeof window.docx === 'undefined') {
+            await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js');
+        }
+
+        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, HeadingLevel, AlignmentType, convertInchesToTwip } = window.docx;
+
+        // Construir documento
+        const children = [];
+
+        // Título
+        children.push(
+            new Paragraph({
+                children: [
+                    new TextRun({ 
+                        text: SCHOOL_CONFIG.name || 'Institución Educativa', 
+                        bold: true, 
+                        size: 32,
+                        font: 'Arial'
+                    })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 200 }
+            })
+        );
+
+        // Subtítulo
+        children.push(
+            new Paragraph({
+                children: [
+                    new TextRun({
+                        text: `Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}`,
+                        size: 22,
+                        font: 'Arial',
+                        color: '333333'
+                    })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 100 }
+            })
+        );
+
+        // Fecha
+        children.push(
+            new Paragraph({
+                children: [
+                    new TextRun({
+                        text: `Generado: ${getCurrentDate()}`,
+                        size: 18,
+                        font: 'Arial',
+                        color: '666666'
+                    })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 400 }
+            })
+        );
+
+        // Tabla de alumnos
+        const tableRows = [];
+
+        // Encabezados
+        const headerCells = [
+            'N°', 'Nombre', 'Cédula', 'F.N.', 'Edad', 'Sexo', 'Indígena', 'Grado', 'Sección', 'Representante', 'Cédula Rep.'
+        ].map(text => new TableCell({
+            children: [new Paragraph({
+                children: [new TextRun({ text, bold: true, size: 18, font: 'Arial' })],
+                alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: 'dbeafe' },
+            borders: {
+                top: { style: BorderStyle.SINGLE, size: 1 },
+                bottom: { style: BorderStyle.SINGLE, size: 1 },
+                left: { style: BorderStyle.SINGLE, size: 1 },
+                right: { style: BorderStyle.SINGLE, size: 1 }
+            }
+        }));
+
+        tableRows.push(new TableRow({ children: headerCells }));
+
+        // Datos
+        data.forEach((s, i) => {
+            const rowCells = [
+                String(i + 1),
+                s.nombre || '',
+                s.cedula_escolar || '',
+                s.fecha_nac || '',
+                String(s.edad || ''),
+                s.sexo || '',
+                s.indigena || '',
+                s.grado || '',
+                s.seccion || '',
+                s.representante || '',
+                s.cedula_rep || ''
+            ].map(text => new TableCell({
+                children: [new Paragraph({
+                    children: [new TextRun({ text: String(text), size: 16, font: 'Arial' })],
+                    alignment: AlignmentType.CENTER
+                })],
+                borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 }
+                }
+            }));
+
+            tableRows.push(new TableRow({ children: rowCells }));
+        });
+
+        // Crear tabla
+        children.push(
+            new Table({
+                rows: tableRows,
+                width: { size: 100, type: 'percentage' },
+                borders: {
+                    insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+                    insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 }
+                }
+            })
+        );
+
+        // Pie de página
+        children.push(
+            new Paragraph({
+                children: [
+                    new TextRun({
+                        text: `Total de alumnos: ${data.length}`,
+                        size: 18,
+                        font: 'Arial',
+                        color: '666666'
+                    })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { before: 200 }
+            })
+        );
+
+        // Crear documento
+        const doc = new Document({
+            sections: [{
+                properties: {
+                    page: {
+                        margin: {
+                            top: convertInchesToTwip(0.8),
+                            bottom: convertInchesToTwip(0.8),
+                            left: convertInchesToTwip(0.8),
+                            right: convertInchesToTwip(0.8)
+                        }
+                    }
+                },
+                children: children
+            }]
+        });
+
+        // Generar y descargar
+        const blob = await Packer.toBlob(doc);
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+        showToast('Datos exportados a DOCX ✅', 'success');
+    } catch (error) {
+        console.error('Error al exportar a DOCX con docx.js, usando fallback HTML:', error);
+        // Fallback: usar método HTML (más compatible)
+        try {
+            await exportToDOCXFallback(data, filename);
+        } catch (fallbackError) {
+            showToast('Error al exportar a DOCX: ' + fallbackError.message, 'error');
+        }
+    }
+}
+
+// ============================================================
+// 6b. FALLBACK DOCX (HTML con formato MIME para Word)
+// ============================================================
+async function exportToDOCXFallback(data, filename = 'alumnos.docx') {
+    if (!data || !data.length) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    try {
+        // Usar MIME HTML (Word lo abre sin problemas)
         let html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' 
               xmlns:w='urn:schemas-microsoft-com:office:word' 
               xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
             <meta charset="UTF-8">
-            <title>Lista de Alumnos</title>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
             <!--[if gte mso 9]>
             <xml>
                 <w:WordDocument>
                     <w:View>Print</w:View>
                     <w:Zoom>100</w:Zoom>
+                    <w:DoNotOptimizeForBrowser/>
                 </w:WordDocument>
             </xml>
             <![endif]-->
             <style>
+                /* Estilos para Word */
                 body { 
-                    font-family: 'Segoe UI', Arial, sans-serif; 
+                    font-family: 'Arial', sans-serif; 
                     margin: 40px;
                     color: #1e293b;
                 }
@@ -269,23 +466,21 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                 table { 
                     width: 100%; 
                     border-collapse: collapse; 
-                    font-size: 10pt;
+                    font-size: 9pt;
                     margin-top: 20px;
                 }
                 th { 
                     background: #2563eb; 
                     color: white; 
-                    padding: 8px; 
+                    padding: 6px 8px; 
                     text-align: left; 
                     font-weight: bold;
                     border: 1px solid #2563eb;
                 }
                 td { 
-                    padding: 6px 8px; 
+                    padding: 4px 6px; 
                     border: 1px solid #d1d5db;
-                }
-                tr:nth-child(even) { 
-                    background: #f8fafc; 
+                    text-align: center;
                 }
                 .footer { 
                     margin-top: 30px; 
@@ -295,15 +490,6 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                     font-size: 10pt;
                     text-align: center;
                 }
-                .badge {
-                    display: inline-block;
-                    padding: 2px 8px;
-                    border-radius: 12px;
-                    font-size: 9pt;
-                    font-weight: bold;
-                }
-                .badge-indigena { background: #fef3c7; color: #92400e; }
-                .badge-sexo { background: #dbeafe; color: #1e40af; }
             </style>
         </head>
         <body>
@@ -312,8 +498,6 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                 <div class="subtitle">Año Escolar ${SCHOOL_CONFIG.academicYear || '2025-2026'}</div>
                 <div class="info">
                     <span>📅 ${getCurrentDate()}</span>
-                    <span>📞 ${SCHOOL_CONFIG.phone || ''}</span>
-                    <span>✉️ ${SCHOOL_CONFIG.email || ''}</span>
                 </div>
             </div>
             
@@ -323,7 +507,7 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th>Cédula Escolar</th>
+                        <th>Cédula</th>
                         <th>F.N.</th>
                         <th>Edad</th>
                         <th>Sexo</th>
@@ -338,19 +522,17 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
         `;
 
         data.forEach((s, i) => {
-            const sexoBadge = s.sexo ? `<span class="badge badge-sexo">${s.sexo}</span>` : '—';
-            const indBadge = s.indigena ? `<span class="badge badge-indigena">${s.indigena}</span>` : '—';
             html += `
                 <tr>
-                    <td style="text-align:center;">${i + 1}</td>
-                    <td><strong>${escHtml(s.nombre || '')}</strong></td>
+                    <td>${i + 1}</td>
+                    <td>${escHtml(s.nombre || '')}</td>
                     <td>${escHtml(s.cedula_escolar || '')}</td>
                     <td>${s.fecha_nac || ''}</td>
-                    <td style="text-align:center;">${s.edad || ''}</td>
-                    <td style="text-align:center;">${sexoBadge}</td>
-                    <td style="text-align:center;">${indBadge}</td>
-                    <td style="text-align:center;">${s.grado || ''}</td>
-                    <td style="text-align:center;">${s.seccion || ''}</td>
+                    <td>${s.edad || ''}</td>
+                    <td>${s.sexo || ''}</td>
+                    <td>${s.indigena || ''}</td>
+                    <td>${s.grado || ''}</td>
+                    <td>${s.seccion || ''}</td>
                     <td>${escHtml(s.representante || '')}</td>
                     <td>${escHtml(s.cedula_rep || '')}</td>
                 </tr>
@@ -362,14 +544,15 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
             </table>
             <div class="footer">
                 <p>Total de alumnos: <strong>${data.length}</strong></p>
-                <p>${SCHOOL_CONFIG.name || 'Institución Educativa'} · ${SCHOOL_CONFIG.address || ''}</p>
+                <p>${SCHOOL_CONFIG.name || 'Institución Educativa'}</p>
             </div>
         </body>
         </html>
         `;
 
+        // Crear archivo DOCX con formato MIME (Word lo abre)
         const blob = new Blob([html], { 
-            type: 'application/msword;charset=utf-8' 
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8'
         });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -379,13 +562,12 @@ function exportToDOCX(data, filename = 'alumnos.docx') {
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
 
-        showToast('Datos exportados a DOCX ✅', 'success');
+        showToast('Datos exportados a DOCX (versión compatible) ✅', 'success');
     } catch (error) {
-        console.error('Error al exportar a DOCX:', error);
-        showToast('Error al exportar a DOCX: ' + error.message, 'error');
+        console.error('Error en fallback DOCX:', error);
+        throw error;
     }
 }
-
 // ============================================================
 // 7. FORMATO JSON (Respaldo)
 // ============================================================
