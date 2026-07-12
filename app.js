@@ -1,5 +1,5 @@
 // =================================================================
-// 1. CONFIGURACIÓN SUPABASE 
+// 1. CONFIGURACIÓN SUPABASE
 // =================================================================
 const SUPABASE_URL = 'https://mveqwpsmgtvlmzdcbxkj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12ZXF3cHNtZ3R2bG16ZGNieGtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODA4NzAsImV4cCI6MjA5ODY1Njg3MH0.JKecCwzBgS7cePVJVEhWnmLIGgcwunz-lU16EeRmeUY';
@@ -52,13 +52,13 @@ const sEdad = $('#sEdad');
 const sLugarNac = $('#sLugarNac');
 const sSexo = $('#sSexo');
 const sIndigena = $('#sIndigena');
+const sGrado = $('#sGrado');
+const sSeccion = $('#sSeccion');
 const sRepresentante = $('#sRepresentante');
 const sCedulaRep = $('#sCedulaRep');
 const modalSaveBtn = $('#modalSaveBtn');
 const modalSaveText = $('#modalSaveText');
 const modalSaveSpinner = $('#modalSaveSpinner');
-const sGrado = $('#sGrado');
-const sSeccion = $('#sSeccion');
 
 // =================================================================
 // 4. TOAST SYSTEM
@@ -160,7 +160,7 @@ function renderStudents(list) {
     const data = list || allStudents;
     if (!data.length) {
         studentsBody.innerHTML = `
-            <tr><td colspan="9">
+            <tr><td colspan="11">
                 <div class="empty-state">
                     <span>📚</span>
                     <h3>No hay alumnos registrados</h3>
@@ -183,25 +183,25 @@ function renderStudents(list) {
         const sexoBadge = sexo !== '—' ? `<span class="badge badge-sexo">${sexo}</span>` : '—';
 
         html += `
-                <tr>
-                    <td><strong>${num}</strong></td>
-                    <td><strong>${escHtml(s.nombre)}</strong></td>
-                    <td>${escHtml(s.cedula_escolar || '')}</td>
-                    <td>${fecha}</td>
-                    <td>${edad}</td>
-                    <td>${sexoBadge}</td>
-                    <td>${indBadge}</td>
-                    <td>${s.grado || ''}</td>
-                    <td>${s.seccion || ''}</td>
-                    <td>${escHtml(s.representante || '')}</td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="btn btn-warning btn-sm edit-btn" data-id="${s.id}">✏️</button>
-                            <button class="btn btn-danger btn-sm delete-btn" data-id="${s.id}">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td><strong>${num}</strong></td>
+                <td><strong>${escHtml(s.nombre)}</strong></td>
+                <td>${escHtml(s.cedula_escolar || '')}</td>
+                <td>${fecha}</td>
+                <td>${edad}</td>
+                <td>${sexoBadge}</td>
+                <td>${indBadge}</td>
+                <td>${s.grado || ''}</td>
+                <td>${s.seccion || ''}</td>
+                <td>${escHtml(s.representante || '')}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-warning btn-sm edit-btn" data-id="${s.id}">✏️</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${s.id}">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `;
     });
     studentsBody.innerHTML = html;
     updateStats(data);
@@ -431,16 +431,15 @@ studentForm.addEventListener('submit', async (e) => {
     const lugar_nac = sLugarNac.value.trim();
     const sexo = sSexo.value;
     const indigena = sIndigena.value;
-    const representante = sRepresentante.value.trim();
-    const cedula_rep = sCedulaRep.value.trim();
     const grado = sGrado.value;
     const seccion = sSeccion.value;
+    const representante = sRepresentante.value.trim();
+    const cedula_rep = sCedulaRep.value.trim();
 
-    // Validación
-if (!nombre || !cedula_escolar || !fecha_nac || !sexo || !grado || !seccion || !representante) {
-    showToast('Completa todos los campos obligatorios (*).', 'warning');
-    return;
-}
+    if (!nombre || !cedula_escolar || !fecha_nac || !sexo || !grado || !seccion || !representante) {
+        showToast('Completa todos los campos obligatorios (*).', 'warning');
+        return;
+    }
 
     const edad = parseInt(sEdad.value) || null;
 
@@ -538,33 +537,33 @@ exportDropdown.addEventListener('click', async (e) => {
 
     try {
         switch (format) {
-    case 'csv':
-        await window.exportToCSV(dataToExport);
-        break;
-    case 'excel':
-        await window.exportToExcel(dataToExport);
-        break;
-    case 'pdf':
-        await window.exportToPDF(dataToExport);
-        break;
-    case 'docx':
-        await window.exportToDOCX(dataToExport);
-        break;
-    case 'json':
-        await window.exportToJSON(dataToExport);
-        break;
-    case 'html':
-        await window.exportToHTML(dataToExport);
-        break;
-    case 'txt':
-        await window.exportToTXT(dataToExport);
-        break;
-    case 'md':
-        await window.exportToMD(dataToExport);
-        break;
-    default:
-        showToast('Formato no soportado.', 'error');
-}
+            case 'csv':
+                await window.exportToCSV(dataToExport);
+                break;
+            case 'excel':
+                await window.exportToExcel(dataToExport);
+                break;
+            case 'pdf':
+                await window.exportToPDF(dataToExport);
+                break;
+            case 'docx':
+                await window.exportToDOCX(dataToExport);
+                break;
+            case 'json':
+                await window.exportToJSON(dataToExport);
+                break;
+            case 'html':
+                await window.exportToHTML(dataToExport);
+                break;
+            case 'txt':
+                await window.exportToTXT(dataToExport);
+                break;
+            case 'md':
+                await window.exportToMD(dataToExport);
+                break;
+            default:
+                showToast('Formato no soportado.', 'error');
+        }
     } catch (err) {
         showToast('Error en exportación: ' + err.message, 'error');
     }
