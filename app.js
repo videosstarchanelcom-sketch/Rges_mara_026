@@ -413,6 +413,13 @@ searchInput.addEventListener('input', () => {
 
 addStudentBtn.addEventListener('click', () => openModal('Nuevo Alumno'));
 
+const historyBtn = document.getElementById('historyBtn');
+if (historyBtn) {
+    historyBtn.addEventListener('click', () => {
+        window.open('history.html', '_blank');
+    });
+}
+
 modalCloseBtn.addEventListener('click', closeModal);
 modalCancelBtn.addEventListener('click', closeModal);
 modal.addEventListener('click', (e) => {
